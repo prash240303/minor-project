@@ -23,8 +23,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-
-
 mongoose.connect('mongodb+srv://blog:0zXyrWabeG2ah6ny@cluster0.dbu5fu8.mongodb.net/?retryWrites=true&w=majority')
   .then(() => {
     console.log("DB connection successful.");
@@ -145,8 +143,6 @@ app.get('/post/:id', async (req, res) => {
   const postDoc = await Post.findById(id).populate('author', ['username']);
   res.json(postDoc);
 })
-
-
 
 
 // dataset 
