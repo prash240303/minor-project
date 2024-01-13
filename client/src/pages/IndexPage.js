@@ -27,9 +27,9 @@ export default function IndexPage() {
 
   return (
     <>
-      {/* {posts.length > 0 && posts.map((post, id) => (
+      {posts.length > 0 && posts.map((post, id) => (
         <Post key={id} {...post} />
-      ))} */}
+      ))}
       {dataset.length > 0 && dataset.map((dataset, id) => (
         <Dataset key={id} {...dataset} />
       ))}
