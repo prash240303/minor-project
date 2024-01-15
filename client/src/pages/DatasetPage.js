@@ -3,20 +3,56 @@ import { useParams } from "react-router-dom";
 import { formatISO9075 } from "date-fns";
 import { UserContext } from "../UserContext";
 import { Link } from 'react-router-dom';
+
 import "./DatasetPage.css";
+
+import CSVDataTable from "../CSVDataTable";
 
 export default function DatasetPage() {
   const [dataset, setDataset] = useState(null);
   const { userInfo } = useContext(UserContext);
+  const [csvData, setCsvData] = useState([]);
+
   const { id } = useParams();
 
   useEffect(() => {
     fetch(`http://localhost:4000/dataset/${id}`)
-      .then(response => response.json())
-      .then(datasetInfo => {
-        setDataset(datasetInfo);
+
+      .then(response => {
+        response.json().then(datasetInfo => {
+          setDataset(datasetInfo);
+          fetchCSVFile(datasetInfo.dataset); // Fetch and parse CSV file
+          // console.log("datasetInfo", datasetInfo);
+        });
       });
   }, []);
+
+  const fetchCSVFile = (filePath) => {
+    fetch(`http://localhost:4000/${filePath.replace(/\\/g, "/")}`)
+      .then(response => response.text())
+      .then(csvText => parseCSV(csvText))
+      .catch(error => {
+        console.error("Error fetching CSV file:", error);
+      });
+  };
+
+  const parseCSV = (csvText) => {
+    const lines = csvText.split("\n");
+    const headers = lines[0].split(",");
+    const parsedData = [];
+    for (let i = 1; i < lines.length; i++) {
+      const currentLine = lines[i].split(",");
+      if (currentLine.length === headers.length) {
+        const row = {};
+        for (let j = 0; j < headers.length; j++) {
+          row[headers[j].trim()] = currentLine[j].trim();
+        }
+        parsedData.push(row);
+      }
+    }
+    setCsvData(parsedData);
+    console.log("parsedData", parsedData)
+  };
 
   if (!dataset) {
     return <div>No data found...</div>;
@@ -48,6 +84,10 @@ export default function DatasetPage() {
       <div className="image">
         <img src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
       </div>
+
+      <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
+      {csvData.length > 0 && <CSVDataTable data={csvData} />}
+
     </div>
   );
 }
