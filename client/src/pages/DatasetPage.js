@@ -4,7 +4,7 @@ import { formatISO9075 } from "date-fns";
 import { UserContext } from "../UserContext";
 import { Link } from 'react-router-dom';
 
-import "./DatasetPage.css";
+import "../styles/DatasetPage.css";
 
 import CSVDataTable from "../CSVDataTable";
 
