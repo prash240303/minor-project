@@ -54,6 +54,16 @@ export default function DatasetPage() {
     console.log("parsedData", parsedData)
   };
 
+  
+  // seprate each tag : "earth earthquake quake"--> "earthquake", "quake" ,"earth"
+  const tags = dataset?.tag?.split(" ").map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+  console.log("tags", tags)
+
+  //handle download 
+  function handleDownnload() {
+    console.log("hi")
+  }
+
   if (!dataset) {
     return <div>No data found...</div>;
   }
@@ -73,7 +83,19 @@ export default function DatasetPage() {
       <div >
         <img  className="image" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
       </div>
+      <div>
+        {/* dio number */}
+        DOI number {dataset.doi}
+      </div>
+        {/* tags */}
+        {tags.map((tag, id) => (
+          <span className="tag">{tag}  || </span>
+        ))}
 
+      {/* download button */}
+      <div onClick={() => handleDownnload}>
+          download Dataset
+      </div>
       <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
       {csvData.length > 0 && <CSVDataTable data={csvData} />}
 
