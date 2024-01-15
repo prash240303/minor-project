@@ -1,5 +1,4 @@
-/* Add your preferred styles here */
-.post-page {
+/* .post-page {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -48,15 +47,28 @@
   }
   
   .image {
-    flex: 1;
-    max-width: 400px;
-  }
-  
-  .image img {
     width: 100%;
-    height: auto;
   }
   
+
   .editor{
     width: 100%;
+  }
+
+  .content {
+    margin-top: 20px;
+    border: #3498db;
+  } */
+
+
+
+  .post-page{
+    align-self: left;
+    margin : 1px;
+    text-align: left;
+  }
+
+  .post-details{
+    flex:2;
+    max-width: 600px;
   }

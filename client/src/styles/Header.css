@@ -17,11 +17,11 @@ header {
   nav {
     display: flex;
     gap: 20px;
+    color: #000;
     align-items: center;
   }
   
   nav a {
-    color: #000;
     text-decoration: none;
     padding: 8px;
     border-radius: 4px;
