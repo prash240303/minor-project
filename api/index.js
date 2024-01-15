@@ -5,7 +5,6 @@ const User = require('./models/User');
 const Post = require('./models/Post');
 const Dataset = require('./models/Dataset');
 
-
 const bcrypt = require('bcryptjs');
 const app = express();
 const jwt = require('jsonwebtoken');
@@ -16,8 +15,6 @@ const fs = require('fs');
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
-
-
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(cookieParser());
@@ -30,6 +27,7 @@ mongoose.connect('mongodb+srv://blog:0zXyrWabeG2ah6ny@cluster0.dbu5fu8.mongodb.n
   .catch((err) => {
     console.log(`DB connection error:${err}`);
   });
+
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
@@ -168,17 +166,20 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
   const { token } = req.cookies;
   jwt.verify(token, secret, {}, async (err, info) => {
     if (err) throw err;
-    const { title, summary, content } = req.body;
-    
+    console.log('request body', req.body)
+
+    const { title, summary,tag,doi, content } = req.body;
     const datasetDoc = await Dataset.create({
       title,
       summary,
+      tag,
+      doi,
       content,
       coverimage: newImagePath, 
       dataset: newDatasetPath, 
       author: info.id,
     });
-
+    console.log("doc:" , datasetDoc)
     res.json(datasetDoc);
   });
 });
@@ -198,8 +199,6 @@ app.get('/dataset/:id', async (req, res) => {
   const datasetDoc = await Dataset.findById(id).populate('author', ['username']);
   res.json(datasetDoc);
 })
-
-
 
 
 app.listen(4000);

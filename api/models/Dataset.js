@@ -4,6 +4,8 @@ const { Schema, model } = mongoose;
 const DatasetSchema = new Schema({
   title: String,
   summary: String,
+  tag: String,
+  doi:String,
   content: String,
   coverimage: String,
   dataset: String,
