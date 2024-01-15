@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./UserContext";
+import "./Header.css";
 
 export default function Header() {
   const { setUserInfo, userInfo } = useContext(UserContext);
@@ -26,17 +27,19 @@ export default function Header() {
 
   return (
     <header>
-      <Link to="/" className="logo">MyBlog</Link>
+      <Link to="/" className="logo">MyDataSet</Link>
       <nav>
         {username && (
           <>
-            <Link to="/create">Create new post</Link>
             <Link to="/createdata">Upload new dataset</Link>
             <a onClick={logout}>Logout ({username})</a>
           </>
         )}
         {!username && (
           <>
+          <div className="search-bar">
+          <input type="text" className="search-input" placeholder="Search" />
+        </div>
             <Link to="/login">Login</Link>
             <Link to="/register">Register</Link>
           </>
