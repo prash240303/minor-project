@@ -1,0 +1,59 @@
+/* Add your preferred styles here */
+.post-page {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin : 1px;
+  }
+  
+  .post-details {
+    flex:2;
+    max-width: 600px;
+  }
+  
+  .post-details h1 {
+    margin-right: 1px;
+    margin-left: 100px;
+  }
+  
+  .author-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .author-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .author-username {
+    font-weight: bold;
+  }
+  
+  .edit-row {
+    margin-bottom: 10px;
+  }
+  
+  .edit-btn {
+    display: flex;
+    align-items: center;
+    color: #3498db;
+    text-decoration: none;
+  }
+  
+  .edit-btn svg {
+    margin-right: 5px;
+  }
+  
+  .image {
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .image img {
+    width: 100%;
+    height: auto;
+  }
+  
