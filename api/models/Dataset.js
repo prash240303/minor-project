@@ -7,6 +7,7 @@ const DatasetSchema = new Schema({
   content: String,
   coverimage: String,
   dataset: String,
+  tags: String,
   author: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,

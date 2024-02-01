@@ -19,7 +19,7 @@ export default function DatasetPage() {
         response.json().then(datasetInfo => {
           setDataset(datasetInfo);
           fetchCSVFile(datasetInfo.dataset); // Fetch and parse CSV file
-          // console.log("datasetInfo", datasetInfo);
+          console.log("all datasets", datasetInfo);
         });
       });
   }, []);

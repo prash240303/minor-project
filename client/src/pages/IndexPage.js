@@ -19,7 +19,6 @@ export default function IndexPage() {
     fetch('http://localhost:4000/dataset').then(response => {
       response.json().then(dataset => {
         setDataset(dataset);
-        console.log("erdhth", dataset);
       });
     });
   }

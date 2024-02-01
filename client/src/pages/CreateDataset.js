@@ -8,6 +8,7 @@ export default function CreateDataset() {
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [content, setContent] = useState('');
+  const [tags, setTags] = useState('');
   const [dataset, setDataset] = useState('');
   const [coverimage, setCoverimage] = useState('');
   const [redirect, setRedirect] = useState(false);
@@ -19,8 +20,8 @@ export default function CreateDataset() {
     data.set('content', content);
     data.set('coverimage', coverimage[0]);
     data.set('dataset', dataset[0]);
+    data.set('tags', tags);
     ev.preventDefault();
-    console.log("data", data);
     const response = await fetch('http://localhost:4000/dataset', {
       method: 'POST',
       body: data,
@@ -35,19 +36,35 @@ export default function CreateDataset() {
   }
   return (
     <form onSubmit={createNewDataset}>
+      title of the dataset
       <input type="title"
         placeholder={'Title'}
         value={title}
         onChange={ev => setTitle(ev.target.value)} />
+
+      summary of the dataset
       <input type="summary"
         placeholder={'Summary'}
         value={summary}
         onChange={ev => setSummary(ev.target.value)} />
+
+      upload dataset
       <input type="file" name='dataset'
         onChange={ev => setDataset(ev.target.files)} />
+
+      upload cover image
       <input type="file" name='coverimage'
         onChange={ev => setCoverimage(ev.target.files)} />
+
+      subject areas for the dataset
+      <input typeof='text' name='tags'
+        placeholder='Subject areas'
+        value={tags}
+        onChange={ev => setTags(ev.target.value)} />
+
+      description of the dataset
       <Editor value={content} onChange={setContent} />
+
       <button style={{ marginTop: '5px' }}>Create dataset</button>
     </form>
   );
