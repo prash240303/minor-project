@@ -39,9 +39,10 @@ const CSVDataTable = ({ data }) => {
 const tableStyle = {
   borderCollapse: "collapse",
   width: "100%",
+  margin: "200px 0",
+  position: "relative",
   borderRadius: "10px",
   overflow: "hidden",
-  boxShadow: "40px 90px 55px -20px rgba(155, 184, 243, 0.2)",
 };
 
 const tableHeaderStyle = {
