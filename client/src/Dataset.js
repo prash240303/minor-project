@@ -1,4 +1,4 @@
-import { formatISO9075 } from "date-fns";
+import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,7 +9,7 @@ const DatasetCard = ({ _id, title, summary, coverimage, dataset, createdAt, auth
     if (coverimage) {
       setImageSrc(`http://localhost:4000/${coverimage}`);
     }
-    else{
+    else {
       setImageSrc("/demoImage.png")
     }
   }, [coverimage]);
@@ -26,9 +26,10 @@ const DatasetCard = ({ _id, title, summary, coverimage, dataset, createdAt, auth
         <p className="text-gray-600 mb-2">
           <span className="font-semibold">Author:</span> {author.username}
         </p>
-        <p className="text-gray-600 mb-2">
-          <span className="font-semibold">Created At:</span> {formatISO9075(new Date(createdAt))}
-        </p>
+        {/* <p className="text-gray-600 mb-2">
+          <span className="font-semibold">Created At:</span> 
+          <time>{format(new Date(dataset.createdAt), "do MMM yyyy")} </time> 
+        </p> */}
         <p className="text-gray-700 text-base">{summary}</p>
       </div>
     </div>

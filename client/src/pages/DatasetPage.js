@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { formatISO9075 } from "date-fns";
+import { format } from "date-fns";
 import { UserContext } from "../UserContext";
 import CSVDataTable from "../CSVDataTable";
 
@@ -83,12 +83,13 @@ export default function DatasetPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-4 md:mb-8">
-        <img className="w-full md:max-w-lg h-auto mx-auto mb-4" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
+        <img className="w-full md:max-w-lg h-auto mx-auto  mb-4" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
         <h1 className="font-bold text-3xl text-center mb-2">{dataset.title}</h1>
+        <h5 className="text-base text-gray-500  text-center">{dataset.subtitle}</h5>
         <div className="text-gray-600 text-sm text-center">
           <div className="flex flex-col items-center mb-2">
-            <span className="mr-2">@{dataset.author.username}</span>
-            <time>{formatISO9075(new Date(dataset.createdAt))}</time>
+            <span className="mr-2">Author @{dataset.author.username}</span>
+            <time>{format(new Date(dataset.createdAt), "do MMM yyyy")}</time>
           </div>
           {/* Additional details (DOI, etc.) can be added here */}
         </div>

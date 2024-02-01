@@ -2,12 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require("mongoose");
 const User = require('./models/User');
-const Post = require('./models/Post');
 const Dataset = require('./models/Dataset');
 
 // var admin = require("firebase-admin");
 // const serviceAccount = require('../mydatasets-7a305-firebase-adminsdk-kibwx-4708d55395.json'); // Change this to your key path
-
 const bcrypt = require('bcryptjs');
 const app = express();
 const jwt = require('jsonwebtoken');
@@ -40,7 +38,6 @@ mongoose.connect('mongodb+srv://blog:0zXyrWabeG2ah6ny@cluster0.dbu5fu8.mongodb.n
   .catch((err) => {
     console.log(`DB connection error:${err}`);
   });
-
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
@@ -113,13 +110,14 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
     if (err) throw err;
     console.log('request body', req.body)
 
-    const { title, summary,tag,doi, content } = req.body;
+    const { title, summary,tag,doi, content, subtitle } = req.body;
     const datasetDoc = await Dataset.create({
       title,
       summary,
       tag,
       doi,
       content,
+      subtitle,
       coverimage: newImagePath, 
       dataset: newDatasetPath, 
       author: info.id,
@@ -128,7 +126,6 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
     res.json(datasetDoc);
   });
 });
-
 
 // app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 }, { name: 'dataset', maxCount: 1 }]), async (req, res) => {
 //   const { coverimage, dataset } = req.files;

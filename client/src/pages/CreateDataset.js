@@ -11,6 +11,7 @@ export default function CreateDataset() {
   const [content, setContent] = useState('');
   const [tag, setTag] = useState('');
   const [doi, setDoi] = useState('')
+  const [subtitle, setSubTitle] = useState('')
   const [dataset, setDataset] = useState('');
   const [coverimage, setCoverimage] = useState('');
   const [redirect, setRedirect] = useState(false);
@@ -25,6 +26,7 @@ export default function CreateDataset() {
     data.set('coverimage', coverimage[0]);
     data.set('dataset', dataset[0]);
     data.set('tags', tag);
+    data.set('subtitle', subtitle)
     ev.preventDefault();
     console.log("data from forms", data.tag);
     const response = await fetch('http://localhost:4000/dataset', {
@@ -46,13 +48,20 @@ export default function CreateDataset() {
         placeholder={'Title'}
         value={title}
         onChange={ev => setTitle(ev.target.value)} />
+
+      Subtitle
+      <input type="Subtitle"
+        placeholder={'Subtitle'}
+        value={subtitle}
+        onChange={ev => setSubTitle(ev.target.value)} />
+        
       summary of the dataset
 
       <input type="summary"
         placeholder={'Summary'}
         value={summary}
         onChange={ev => setSummary(ev.target.value)} />
-      
+
       Tags
       <input type="tag"
         placeholder={'tag'}
