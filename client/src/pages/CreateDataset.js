@@ -24,7 +24,7 @@ export default function CreateDataset() {
     data.set('content', content);
     data.set('coverimage', coverimage[0]);
     data.set('dataset', dataset[0]);
-    data.set('tags', tags);
+    data.set('tags', tag);
     ev.preventDefault();
     console.log("data from forms", data.tag);
     const response = await fetch('http://localhost:4000/dataset', {
