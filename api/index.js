@@ -5,6 +5,9 @@ const User = require('./models/User');
 const Post = require('./models/Post');
 const Dataset = require('./models/Dataset');
 
+// var admin = require("firebase-admin");
+// const serviceAccount = require('../mydatasets-7a305-firebase-adminsdk-kibwx-4708d55395.json'); // Change this to your key path
+
 const bcrypt = require('bcryptjs');
 const app = express();
 const jwt = require('jsonwebtoken');
@@ -19,6 +22,16 @@ app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
+
+
+
+// // Initialize Firebase Admin SDK
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   storageBucket: 'mydatasets-7a305.appspot.com',
+// });
+
+// const bucket = admin.storage().bucket();
 
 mongoose.connect('mongodb+srv://blog:0zXyrWabeG2ah6ny@cluster0.dbu5fu8.mongodb.net/?retryWrites=true&w=majority')
   .then(() => {
@@ -73,74 +86,6 @@ app.post('/logout', (req, res) => {
   res.cookie('token', '').json('ok');
 });
 
-app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
-  const { originalname, path } = req.file;
-  const parts = originalname.split('.');
-  const ext = parts[parts.length - 1];
-  const newPath = path + '.' + ext;
-  fs.renameSync(path, newPath);
-
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
-    const { title, summary, content } = req.body;
-    const postDoc = await Post.create({
-      title,
-      summary,
-      content,
-      cover: newPath,
-      author: info.id,
-    });
-    res.json(postDoc);
-  });
-
-});
-
-app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
-  let newPath = null;
-  if (req.file) {
-    const { originalname, path } = req.file;
-    const parts = originalname.split('.');
-    const ext = parts[parts.length - 1];
-    newPath = path + '.' + ext;
-    fs.renameSync(path, newPath);
-  }
-
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
-    const { id, title, summary, content } = req.body;
-    const postDoc = await Post.findById(id);
-    const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
-    if (!isAuthor) {
-      return res.status(400).json('you are not the author');
-    }
-    await postDoc.update({
-      title,
-      summary,
-      content,
-      cover: newPath ? newPath : postDoc.cover,
-    });
-
-    res.json(postDoc);
-  });
-
-});
-
-app.get('/post', async (req, res) => {
-  res.json(
-    await Post.find()
-      .populate('author', ['username'])
-      .sort({ createdAt: -1 })
-      .limit(20)
-  );
-});
-
-app.get('/post/:id', async (req, res) => {
-  const { id } = req.params;
-  const postDoc = await Post.findById(id).populate('author', ['username']);
-  res.json(postDoc);
-})
 
 
 // dataset 
@@ -183,6 +128,61 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
     res.json(datasetDoc);
   });
 });
+
+
+// app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 }, { name: 'dataset', maxCount: 1 }]), async (req, res) => {
+//   const { coverimage, dataset } = req.files;
+  
+//   // Handle image file
+//   const imageFile = coverimage[0];
+//   const imagePath = imageFile.path;
+//   const imageParts = imageFile.originalname.split('.');
+//   const imageExt = imageParts[imageParts.length - 1];
+//   const newImagePath = imagePath + '.' + imageExt;
+
+//   // Upload image to Firebase Storage
+//   await bucket.upload(newImagePath, {
+//     destination: `datasets/${imageFile.filename}.${imageExt}`,
+//   });
+
+//   // Handle dataset file
+//   const datasetFile = dataset[0];
+//   const datasetPath = datasetFile.path;
+//   const datasetParts = datasetFile.originalname.split('.');
+//   const datasetExt = datasetParts[datasetParts.length - 1];
+//   const newDatasetPath = datasetPath + '.' + datasetExt;
+
+//   // Upload dataset to Firebase Storage
+//   await bucket.upload(newDatasetPath, {
+//     destination: `datasets/${datasetFile.filename}.${datasetExt}`,
+//   });
+
+//   // Delete local files
+//   fs.unlinkSync(newImagePath);
+//   fs.unlinkSync(newDatasetPath);
+
+//   const { token } = req.cookies;
+//   jwt.verify(token, secret, {}, async (err, info) => {
+//     if (err) throw err;
+
+//     const { title, summary, tag, doi, content } = req.body;
+//     const coverImageUrl = `datasets/${imageFile.filename}.${imageExt}`;
+//     const datasetUrl = `datasets/${datasetFile.filename}.${datasetExt}`;
+
+//     const datasetDoc = await Dataset.create({
+//       title,
+//       summary,
+//       tag,
+//       doi,
+//       content,
+//       coverimage: coverImageUrl,
+//       dataset: datasetUrl,
+//       author: info.id,
+//     });
+
+//     res.json(datasetDoc);
+//   });
+// });
 
 app.get('/dataset', async (req,res) => {
   res.json(

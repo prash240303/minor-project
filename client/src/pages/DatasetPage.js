@@ -2,10 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { formatISO9075 } from "date-fns";
 import { UserContext } from "../UserContext";
-import { Link } from 'react-router-dom';
-
-import "../styles/DatasetPage.css";
-
 import CSVDataTable from "../CSVDataTable";
 
 export default function DatasetPage() {
@@ -17,12 +13,10 @@ export default function DatasetPage() {
 
   useEffect(() => {
     fetch(`http://localhost:4000/dataset/${id}`)
-
       .then(response => {
         response.json().then(datasetInfo => {
           setDataset(datasetInfo);
-          fetchCSVFile(datasetInfo.dataset); // Fetch and parse CSV file
-          console.log("all datasets", datasetInfo);
+          fetchCSVFile(datasetInfo.dataset);
         });
       });
   }, []);
@@ -51,54 +45,72 @@ export default function DatasetPage() {
       }
     }
     setCsvData(parsedData);
-    console.log("parsedData", parsedData)
   };
 
-  
-  // seprate each tag : "earth earthquake quake"--> "earthquake", "quake" ,"earth"
   const tags = dataset?.tag?.split(" ").map((tag) => tag.trim()).filter((tag) => tag.length > 0);
-  console.log("tags", tags)
 
-  //handle download 
-  function handleDownnload() {
-    console.log("hi")
-  }
+  const handleDownload = () => {
+    const filePath = dataset?.dataset;
+    const title = dataset?.title;
+
+    if (filePath && title) {
+      const timestamp = Date.now();
+
+      fetch(`http://localhost:4000/${filePath.replace(/\\/g, "/")}`)
+        .then(response => response.blob())
+        .then(blob => {
+          // Create a temporary link to trigger the download
+          const downloadLink = document.createElement("a");
+          const objectURL = window.URL.createObjectURL(blob);
+
+          downloadLink.href = objectURL;
+          downloadLink.download = `${title}_${timestamp}.csv`; // Use dataset title with timestamp as the filename
+          downloadLink.click();
+
+          // Release the object URL
+          window.URL.revokeObjectURL(objectURL);
+        })
+        .catch(error => {
+          console.error("Error fetching CSV file:", error);
+        });
+    }
+  };
 
   if (!dataset) {
     return <div>No data found...</div>;
   }
 
   return (
-    <div className="post-page">
-      <div className="post-details">
-        <h1>{dataset.title}</h1>
-        <div className="author-info">
-          <div>
-            <div className="author">@{dataset.author.username}</div>
+    <div className="p-4 md:p-8">
+      <div className="mb-4 md:mb-8">
+        <img className="w-full md:max-w-lg h-auto mx-auto mb-4" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
+        <h1 className="font-bold text-3xl text-center mb-2">{dataset.title}</h1>
+        <div className="text-gray-600 text-sm text-center">
+          <div className="flex flex-col items-center mb-2">
+            <span className="mr-2">@{dataset.author.username}</span>
             <time>{formatISO9075(new Date(dataset.createdAt))}</time>
           </div>
+          {/* Additional details (DOI, etc.) can be added here */}
         </div>
+        {/* Tags */}
+        <div className="flex flex-wrap justify-center mb-4">
+          {tags.map((tag, id) => (
+            <span key={id} className="bg-gray-200 px-2 py-1 text-xs rounded mr-2 mb-2">{tag}</span>
+          ))}
+        </div>
+        {/* Download button */}
+        <button
+          onClick={handleDownload}
+          className="bg-blue-500 text-white py-2 px-4 rounded w-full md:w-auto focus:outline-none hover:bg-blue-700"
+        >
+          Download Dataset
+        </button>
+      </div>
+      {/* Additional content, if needed */}
+      <div className="w-full md:max-w-6xl mx-auto">
         <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
+        {csvData.length > 0 && <CSVDataTable data={csvData} />}
       </div>
-      <div >
-        <img  className="image" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
-      </div>
-      <div>
-        {/* dio number */}
-        DOI number {dataset.doi}
-      </div>
-        {/* tags */}
-        {tags.map((tag, id) => (
-          <span className="tag">{tag}  || </span>
-        ))}
-
-      {/* download button */}
-      <div onClick={() => handleDownnload}>
-          download Dataset
-      </div>
-      <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
-      {csvData.length > 0 && <CSVDataTable data={csvData} />}
-
     </div>
   );
 }

@@ -40,7 +40,7 @@ export default function CreateDataset() {
     return <Navigate to={'/'} />
   }
   return (
-    <form className="create-dataset-form" onSubmit={createNewDataset}>
+    <form className="create-dataset-form flex flex-col justify-start items-start" onSubmit={createNewDataset}>
       title of the dataset
       <input type="title"
         placeholder={'Title'}
@@ -70,13 +70,10 @@ export default function CreateDataset() {
         onChange={ev => setDataset(ev.target.files)} />
 
       upload cover image
-
       <input type="file" name='coverimage'
         onChange={ev => setCoverimage(ev.target.files)} />
 
-
-
-      <Editor value={content} onChange={setContent} />
+      <Editor value={content} onChange={setContent} className="w-full" />
 
       <button style={{ marginTop: '20px' }}>Create dataset</button>
     </form>

@@ -4,6 +4,8 @@
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
+    display: flex;
+    
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
@@ -29,6 +31,8 @@
   .file-inputs {
     display: flex;
     flex-direction: column;
+    justify-content: start;
+    align-items: start;
     gap: 10px;
   }
   
@@ -48,5 +52,6 @@
     cursor: not-allowed;
   }
   .editor{
+   
     width: 100%;
   }
