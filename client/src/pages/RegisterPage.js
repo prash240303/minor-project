@@ -1,5 +1,5 @@
 import {useState} from "react";
-import "./RegisterPage.css";
+import "../styles/RegisterPage.css";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('');

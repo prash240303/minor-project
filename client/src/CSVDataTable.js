@@ -1,65 +1,44 @@
 import React from "react";
 
+const truncateString = (str, maxLength = 200) => {
+  return str.length > maxLength ? str.substring(0, maxLength) + '...' : str;
+};
+
 const CSVDataTable = ({ data }) => {
   const headers = data.length > 0 ? Object.keys(data[0]) : [];
-  const displayedData = data.slice(0, 12); // Display only the top 12 rows
 
   return (
     <>
       {data.length === 0 ? (
-        <p>No data available.</p>
+        <p className="text-gray-600">No data available.</p>
       ) : (
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              {headers.map((header, index) => (
-                <th key={index} style={tableHeaderStyle}>
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {displayedData.map((row, index) => (
-              <tr key={index}>
-                {headers.map((header, columnIndex) => (
-                  <td key={columnIndex} style={tableCellStyle}>
-                    {row[header]}
-                  </td>
+        <div className="overflow-x-auto overflow-y-auto h-screen">
+          <table className="border-collapse rounded-xl  w-full mt-8 relative overflow-hidden ">
+            <thead>
+              <tr>
+                {headers.map((header, index) => (
+                  <th key={index} className="text-left py-3 px-4 bg-blue-500 text-white text-lg font-semibold border border-white">
+                    {header}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((row, index) => (
+                <tr key={index}>
+                  {headers.map((header, columnIndex) => (
+                    <td key={columnIndex} className="py-3 px-4 border border-gray-300">
+                      {truncateString(row[header])}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );
-};
-
-const tableStyle = {
-  borderCollapse: "collapse",
-  width: "100%",
-  borderRadius: "10px",
-  overflow: "hidden",
-  boxShadow: "40px 90px 55px -20px rgba(155, 184, 243, 0.2)",
-};
-
-const tableHeaderStyle = {
-  fontSize: "14px",
-  fontWeight: 500,
-  color: "#ffffff",
-  backgroundColor: "#6D95E0",
-  borderBottom: "1px solid #ddd",
-  padding: "15px",
-  textAlign: "left",
-};
-
-const tableCellStyle = {
-  fontSize: "14px",
-  fontWeight: 500,
-  borderBottom: "1px solid #ddd",
-  padding: "15px",
-  backgroundColor: "#fff",
 };
 
 export default CSVDataTable;

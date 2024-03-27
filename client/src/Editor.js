@@ -16,7 +16,7 @@ export default function Editor({value,onChange}) {
     ],
   };
   return (
-    <div className="content">
+    <div className="content editor">
     <ReactQuill
       value={value}
       theme={'snow'}

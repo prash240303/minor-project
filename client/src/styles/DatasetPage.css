@@ -1,0 +1,12 @@
+
+
+  .post-page{
+    align-self: left;
+    margin : 1px;
+    text-align: left;
+  }
+
+  .post-details{
+    flex:2;
+    max-width: 600px;
+  }

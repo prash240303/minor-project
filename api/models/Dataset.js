@@ -4,9 +4,14 @@ const { Schema, model } = mongoose;
 const DatasetSchema = new Schema({
   title: String,
   summary: String,
+  tag: String,
+  doi:String,
   content: String,
   coverimage: String,
   dataset: String,
+  tags: String,
+  subtitle:String,
+  license: String,
   author: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,
