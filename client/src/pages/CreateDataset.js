@@ -14,6 +14,7 @@ export default function CreateDataset() {
   const [subtitle, setSubTitle] = useState('')
   const [dataset, setDataset] = useState('');
   const [coverimage, setCoverimage] = useState('');
+  const [license, setLicense] = useState('CC-BY-SA');
   const [redirect, setRedirect] = useState(false);
 
   async function createNewDataset(ev) {
@@ -26,6 +27,7 @@ export default function CreateDataset() {
     data.set('coverimage', coverimage[0]);
     data.set('dataset', dataset[0]);
     data.set('tags', tag);
+    data.set('license', 'CC-BY-SA');
     data.set('subtitle', subtitle)
     ev.preventDefault();
     console.log("data from forms", data.tag);
@@ -51,20 +53,20 @@ export default function CreateDataset() {
 
       Subtitle
       <input type="Subtitle"
-        placeholder={'Subtitle'}
+        placeholder={'Subtitle of the dataset'}
         value={subtitle}
         onChange={ev => setSubTitle(ev.target.value)} />
         
       summary of the dataset
 
       <input type="summary"
-        placeholder={'Summary'}
+        placeholder={'Breif Summary of the dataset'}
         value={summary}
         onChange={ev => setSummary(ev.target.value)} />
 
       Tags
       <input type="tag"
-        placeholder={'tag'}
+        placeholder={'Tags (enter tags separated by space)'}
         value={tag}
         onChange={ev => setTag(ev.target.value)} />
 
@@ -73,6 +75,12 @@ export default function CreateDataset() {
         placeholder={'DOI number'}
         value={doi}
         onChange={ev => setDoi(ev.target.value)} />
+
+      License
+      <input type="license"
+        placeholder={'License'}
+        value={license}
+        onChange={ev => setLicense(ev.target.value)} />
 
       upload dataset
       <input type="file" name='dataset'

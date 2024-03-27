@@ -11,6 +11,7 @@ const DatasetSchema = new Schema({
   dataset: String,
   tags: String,
   subtitle:String,
+  license: String,
   author: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,
