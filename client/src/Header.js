@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./UserContext";
 import "./styles/Header.css";
+import { PlusCircleIcon } from "lucide-react";
 
 export default function Header() {
   const { setUserInfo, userInfo } = useContext(UserContext);
@@ -31,8 +32,10 @@ export default function Header() {
       <nav>
         {username && (
           <>
-            <Link to="/createdata">Upload new dataset</Link>
-            <a onClick={logout}>Logout ({username})</a>
+            <Link className="rounded-full flex gap-4 items-center justify-center font-bold text-lg shadow-lg border border-gray-200 px-3 pr-4 py-3" to="/createdata"> 
+              <PlusCircleIcon className="w-8 text-blue-500 h-8"/>
+              Upload new dataset</Link>
+            <div onClick={logout}>Logout ({username})</div>
           </>
         )}
         {!username && (

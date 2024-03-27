@@ -165,11 +165,19 @@ export default function DatasetPage() {
   const truncatedContent = dataset.content.slice(0, 200); // Adjust the character limit as needed
   const isContentTruncated = dataset.content.length > truncatedContent.length;
 
+
+  // const [completeness, setCompleteness] = useState(0);
+  // const [credibility, setCredibility] = useState(0);
+
+
+  // if all 4 values  Subtitle Tag Description CoverImage exist --100% complete , if 3 exist 75% complete , if 2 exist 50% complete , if 1 exist 25% complete , if none exist 0% complete
+  
+  
   return (
     <>
       <div className="flex flex-col items-center my-4">
         {/* user header , should be sticky at the top of the page on scroll */}
-        <div className="flex justify-between px-12 my-6 w-full items-center">
+        <div className="flex justify-between px-16 my-6 w-full items-center">
           <div className="flex gap-2 place-items-center">
             <img
               className="w-8 h-8 object-cover rounded-full"
@@ -209,7 +217,7 @@ export default function DatasetPage() {
       {/* user header */}
 
       {/* title */}
-      <div className="w-full flex px-12 justify-between items-center">
+      <div className="w-full flex px-16 justify-between items-center">
         <div className="w-full md:max-w-6xl mx-auto">
           <h1 className="font-bold text-5xl text-left mb-4 ">
             {capitalizeFirstLetter(dataset.title)}
@@ -227,10 +235,11 @@ export default function DatasetPage() {
       {/* title */}
 
       {/* menu bar item s: 1 datacard 2 discussion 3 Code */}
+      {/* maintain a state --> conditional render  */}
       {/* menu bar end  */}
 
       {/* datacard */}
-      <div className=" my-12 flex px-12 gap-8 justify-between items-start mx-auto">
+      <div className=" my-12 flex px-16 gap-8 justify-between items-start mx-auto">
         {/* left side */}
         <div className="flex flex-col gap-4 place-items-start">
           <h2 className="font-bold text-3xl text-left mb-4">About Dataset</h2>
@@ -303,8 +312,11 @@ export default function DatasetPage() {
       </div>
       {/* datacard */}
 
+
+
+
       {/* metadata */}
-      <div className="w-full px-12">
+      <div className="w-full px-16">
         <div className="flex gap-4 place-items-center">
           <FileTextIcon className="size-8" />
           <h3 className="font-bold text-3xl text-left">Metadata</h3>
