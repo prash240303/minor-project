@@ -4,10 +4,15 @@ import { useParams } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import CSVDataTable from "../CSVDataTable";
 import {
+  ALargeSmallIcon,
+  BinaryIcon,
   ChevronDown,
   ChevronUp,
+  Columns3Icon,
   DownloadIcon,
   FileTextIcon,
+  Folder,
+  HashIcon,
   Table2Icon,
 } from "lucide-react";
 import { Tooltip } from "react-tooltip";
@@ -24,6 +29,11 @@ export default function DatasetPage() {
   const [upvoteCount, setUpvoteCount] = useState(0); // State to track upvote count
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [fileSize, setFileSize] = useState(0);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [collaboratorsAccordionOpen, setCollaboratorsAccordionOpen] = useState(false);
+  const [authorsAccordionOpen, setAuthorsAccordionOpen] = useState(false);
+  const [coverageAccordionOpen, setCoverageAccordionOpen] = useState(false);
+  const [doiCitationAccordionOpen, setDoiCitationAccordionOpen] = useState(false);
 
   const { id } = useParams();
   const timeDifference = (current, previous) => {
@@ -198,11 +208,58 @@ export default function DatasetPage() {
 
   function handleUpvote() {
     setIsUpvoted(!isUpvoted);
-    // Update upvote count in localStorage
     const newUpvoteCount = isUpvoted ? upvoteCount - 1 : upvoteCount + 1;
     localStorage.setItem(id, newUpvoteCount);
     setUpvoteCount(newUpvoteCount);
   };
+
+
+  const countColumnTypes = () => {
+    let stringCount = 0;
+    let integerCount = 0;
+    let booleanCount = 0;
+
+    if (csvData.length > 0) {
+      const firstRow = csvData[0];
+      Object.values(firstRow).forEach(value => {
+        if (typeof value === 'string') {
+          stringCount++;
+        } else if (typeof value === 'number' && Number.isInteger(value)) {
+          integerCount++;
+        } else if (typeof value === 'boolean') {
+          booleanCount++;
+        }
+      });
+    }
+
+    return { stringCount, integerCount, booleanCount };
+  };
+
+  // Function to toggle the accordion
+  const toggleAccordion = () => {
+    setIsAccordionOpen(!isAccordionOpen);
+  };
+
+
+  const { stringCount, integerCount, booleanCount } = countColumnTypes();
+
+
+  const toggleCollaboratorsAccordion = () => {
+    setCollaboratorsAccordionOpen(!collaboratorsAccordionOpen);
+  };
+
+  const toggleAuthorsAccordion = () => {
+    setAuthorsAccordionOpen(!authorsAccordionOpen);
+  };
+
+  const toggleCoverageAccordion = () => {
+    setCoverageAccordionOpen(!coverageAccordionOpen);
+  };
+
+  const toggleDoiCitationAccordion = () => {
+    setDoiCitationAccordionOpen(!doiCitationAccordionOpen);
+  };
+
 
   return (
     <>
@@ -346,16 +403,19 @@ export default function DatasetPage() {
       {/* datacard */}
 
       {/* dataset table */}
-      <div className="border-y border-gray-300 items-center justify-center flex gap-4 w-full my-6 px-16 py-6">
+      <div className="border-y border-gray-300 items-start  justify-start flex gap-4 w-full my-6 px-16 py-6">
         <div className="flex-[4] border rounded-lg border-gray-300 ">
           {/* two cols one for title and one for table */}
           <div className="flex  flex-col justify-between items-start">
 
-            <div className="flex border-b border-gray-400 w-full p-3 gap-2 place-items-center">
-              <h3 className="font-bold text-2xl p-2 text-left">{dataset.title} <span className="text-gray-400 font-normal text-xl">({fileSize.toFixed(2)} KB{" "})</span>  </h3>
-            </div>
+            <div className="flex justify-between border-b border-gray-400 w-full p-3 pr-6 gap-2 items-center">
+              <div className="font-bold text-2xl p-2 text-left">{dataset.title} <span className="text-gray-400 font-normal text-xl">({fileSize.toFixed(2)} KB{" "})</span>  </div>
 
-            <div className="content" >
+              <div data-tooltip-id="download-icon" className="cursor-pointer" data-tooltip-content="download CSV file"><DownloadIcon /></div>
+            </div>
+            <Tooltip id="download-icon" />
+
+            <div className="content w-full" >
               {csvData.length > 0 && <CSVDataTable data={csvData} />}
             </div >
 
@@ -363,8 +423,33 @@ export default function DatasetPage() {
         </div>
 
         {/* summary */}
-        <div className="flex-[1] p-2 font-bold text-xl">
-          Summary
+        <div className="flex-[1] p-2 items-start justify-start h-full w-full ">
+          <div className="font-bold text-xl mb-2">
+            Summary
+          </div>
+          <div>
+            <span className="text-gray-500 underline">  Version 1</span>
+            <span className="text-gray-700"> ({fileSize.toFixed(2)} KB{" "}) </span>
+          </div>
+          <div className="text-gray-500 mt-2">Last updated {dataset.updatedAt}</div>
+          <div className="flex flex-col text-gray-800 my-6 gap-2">
+
+            <div className="flex w-full gap-2 place-items-center mb-4" >
+              <Folder /> <span> 1 Files</span>
+            </div>
+
+            <div className="flex w-full cursor-pointer justify-between gap-4 place-items-center" onClick={toggleAccordion}>
+              <div className="flex gap-2"><span><Columns3Icon /></span> {csvData[0] ? Object.keys(csvData[0]).length : 0} Columns</div>
+              {isAccordionOpen ? (<ChevronUp />) : (<ChevronDown />)}
+            </div>
+            {isAccordionOpen && (
+              <div className="ml-2 flex flex-col gap-2 mt-2">
+                <div className="flex gap-4 justify-between  w-full items-center"><span className="flex place-items-center gap-2"><ALargeSmallIcon className="w-6 h-6" /> String </span> <span>{stringCount}</span> </div>
+                <div className="flex gap-4 justify-between w-full items-center"><span className="flex place-items-center gap-2"><HashIcon className="w-6 h-6" /> Integer </span> <span>{integerCount}</span></div>
+                <div className="flex gap-4 justify-between w-full items-center"><span className="flex place-items-center gap-2"><BinaryIcon className="w-6 h-6" /> Boolean </span> <span>{booleanCount}</span></div>
+              </div>
+            )}
+          </div>
         </div>
         {/* summary */}
       </div >
@@ -379,31 +464,31 @@ export default function DatasetPage() {
         </div>
 
         {/* collaborators */}
-        <div className="flex flex-col gap-4 pr-12 mt-6 py-4 border-y border-gray-400 place-items-center">
-
-          <div className="flex justify-between items-center w-full gap-2">
-            <h4 className="font-bold text-2xl text-left">Collaborators</h4>
-            <ChevronDown />
-          </div>
-          <div className="flex  flex-col gap-4 place-items-start w-full">
-            <div className="flex gap-2 place-items-center">
-              <img
-                className="w-10 h-10 object-cover rounded-full"
-                src="/logo512.png"
-                alt=""
-              />
-              {capitalizeFirstLetter(dataset.author.username)} (Owner)
-            </div>
-            <div className="flex gap-2 place-items-center">
-              <img
-                className="w-10 h-10 object-cover rounded-full"
-                src="/logo512.png"
-                alt=""
-              />
-              {capitalizeFirstLetter(dataset.author.username)}
-            </div>
-          </div>
+        <div onClick={toggleCollaboratorsAccordion} className={`flex cursor-pointer justify-between items-center w-full mt-4 py-4 pr-6 border-t ${!collaboratorsAccordionOpen&&"border-b border-gray-300"} border-gray-300`}>
+          <h4 className="font-bold text-2xl text-left">Collaborators</h4>
+          {collaboratorsAccordionOpen ? <ChevronDown /> : <ChevronUp />}
         </div>
+        {collaboratorsAccordionOpen && (
+          <div className="flex gap-8 border-b pb-4 px-2 border-gray-300 place-items-start w-full">
+            <div className="flex gap-2 place-items-center">
+              <img
+                className="w-10 h-10 object-cover rounded-full"
+                src="/logo512.png"
+                alt=""
+              />
+              Collaborator 1
+            </div>
+            <div className="flex gap-2 place-items-center">
+              <img
+                className="w-10 h-10 object-cover rounded-full"
+                src="/logo512.png"
+                alt=""
+              />
+              Collaborator 2
+            </div>
+          </div>
+        )}
+
         {/* collaborators */}
 
         {/* DOI citaitons */}
@@ -451,19 +536,5 @@ export default function DatasetPage() {
   );
 }
 
-// eslint-disable-next-line no-lone-blocks
-{/* 
-  <div className="w-full md:max-w-6xl mx-auto">
-    <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
-    {csvData.length > 0 && <CSVDataTable data={csvData} />}
-
-*/}
-
-
-{/*  <div className="grid grid-cols-4 gap-4 p-6 mx-24 ">
-        {dataset.length > 0 && dataset.map((dataset, id) => (
-          <DatasetCard key={id} {...dataset} />
-        ))}
-      </div> */}
 
 

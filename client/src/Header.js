@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { UserContext } from "./UserContext";
 import "./styles/Header.css";
 import { InspectionPanel, PlusCircleIcon } from "lucide-react";
@@ -14,7 +14,7 @@ export default function Header() {
         setUserInfo(userInfo);
       });
     });
-  }, []);
+  });
 
   function logout() {
     fetch('http://localhost:4000/logout', {
@@ -32,10 +32,11 @@ export default function Header() {
       <div className="flex justify-center items-center gap-4">
         {username && (
           <>
-            <Link className="rounded-full flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3" to="/createdata">
-              <PlusCircleIcon className="w-8 text-blue-500 h-8" />
-              Upload new dataset</Link>
-            <div onClick={logout} className="rounded-full flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Logout ({username})</div>
+            <Link className="rounded-full hover:shadow-md hover:text-white hover:bg-blue-500 flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3" to="/createdata">
+              <PlusCircleIcon className="w-8 hover:text-white h-8" />
+              Upload new dataset
+            </Link>
+            <div onClick={logout} className="rounded-full hover:shadow-lg cursor-pointer flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Logout ({username})</div>
           </>
         )}
         {!username && (
