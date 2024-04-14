@@ -18,28 +18,44 @@ export default function CreateDataset() {
   const [redirect, setRedirect] = useState(false);
 
   async function createNewDataset(ev) {
+    ev.preventDefault();
+
+    // Check if any required fields are empty
+    if (!title || !summary || !content || !tag || !doi || !dataset || !coverimage) {
+      console.error('Please fill out all required fields');
+      alert('Please fill out all required fields');
+      return;
+    }
+
     const data = new FormData();
     data.set('title', title);
     data.set('summary', summary);
     data.set('tag', tag);
-    data.set('doi', doi)
+    data.set('doi', doi);
     data.set('content', content);
     data.set('coverimage', coverimage[0]);
     data.set('dataset', dataset[0]);
     data.set('tags', tag);
-    data.set('license', 'CC-BY-SA');
-    data.set('subtitle', subtitle)
-    ev.preventDefault();
-    console.log("data from forms", data.tag);
-    const response = await fetch('http://localhost:4000/dataset', {
-      method: 'POST',
-      body: data,
-      credentials: 'include',
-    });
-    if (response.ok) {
-      setRedirect(true);
+    data.set('license', 'CC0: Public Domain');
+    data.set('subtitle', subtitle);
+
+    try {
+      const response = await fetch('http://localhost:4000/dataset', {
+        method: 'POST',
+        body: data,
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setRedirect(true);
+      } else {
+        console.error('Failed to create dataset:', response.status);
+      }
+    } catch (error) {
+      console.error('Error creating dataset:', error);
     }
   }
+
   if (redirect) {
     return <Navigate to={'/'} />
   }
@@ -56,7 +72,7 @@ export default function CreateDataset() {
         placeholder={'Subtitle of the dataset'}
         value={subtitle}
         onChange={ev => setSubTitle(ev.target.value)} />
-        
+
       summary of the dataset
 
       <input type="summary"

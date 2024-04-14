@@ -14,7 +14,7 @@ export default function RegisterPage() {
     if (response.status === 200) {
       alert('registration successful');
     } else {
-      alert('registration failed');
+      alert('user already exist');
     }
   }
   return (

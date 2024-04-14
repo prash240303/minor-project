@@ -1,12 +1,18 @@
+/* eslint-disable no-unused-vars */
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../UserContext";
-// import CSVDataTable from "../CSVDataTable";
+import CSVDataTable from "../CSVDataTable";
 import {
+  ALargeSmallIcon,
+  BinaryIcon,
   ChevronDown,
   ChevronUp,
+  Columns3Icon,
   DownloadIcon,
   FileTextIcon,
+  Folder,
+  HashIcon,
   Table2Icon,
 } from "lucide-react";
 import { Tooltip } from "react-tooltip";
@@ -16,11 +22,19 @@ import DatasetCard from "../DatasetCard";
 export default function DatasetPage() {
   const [dataset, setDataset] = useState(null);
   const [RelatedDataset, setRelatedDataset] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const { userInfo } = useContext(UserContext);
   const [csvData, setCsvData] = useState([]);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [upvoteCount, setUpvoteCount] = useState(0); // State to track upvote count
+  const [isUpvoted, setIsUpvoted] = useState(false);
+  const [fileSize, setFileSize] = useState(0);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [collaboratorsAccordionOpen, setCollaboratorsAccordionOpen] = useState(false);
+  const [authorsAccordionOpen, setAuthorsAccordionOpen] = useState(false);
+  const [coverageAccordionOpen, setCoverageAccordionOpen] = useState(false);
+  const [doiCitationAccordionOpen, setDoiCitationAccordionOpen] = useState(false);
 
-  
   const { id } = useParams();
   const timeDifference = (current, previous) => {
     const milliSecondsPerMinute = 60 * 1000;
@@ -60,6 +74,14 @@ export default function DatasetPage() {
     }
   };
   useEffect(() => {
+    // Retrieve upvote count from localStorage when component mounts
+    const storedUpvotes = localStorage.getItem(id);
+    if (storedUpvotes) {
+      setUpvoteCount(parseInt(storedUpvotes));
+    }
+  }, [id]);
+
+  useEffect(() => {
     fetch(`http://localhost:4000/dataset/${id}`)
       .then((response) => response.json())
       .then((datasetInfo) => {
@@ -82,17 +104,31 @@ export default function DatasetPage() {
           ...dataset,
           updatedAt: timeDifference(new Date(), new Date(dataset.createdAt))
         }));
-        console.log("related datasets", updatedDatasets)
         setRelatedDataset(updatedDatasets)
       }).catch((error) => {
         console.error("Error fetching related dataset:", error);
       });
-  }, [id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
+  // fetchCSVFile function
   const fetchCSVFile = (filePath) => {
     fetch(`http://localhost:4000/${filePath.replace(/\\/g, "/")}`)
-      .then((response) => response.text())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const contentLength = response.headers.get('Content-Length');
+        if (contentLength) {
+          const fileSizeInBytes = parseInt(contentLength, 10);
+          const fileSizeInKB = fileSizeInBytes / 1024; // 
+          setFileSize(fileSizeInKB);
+        } else {
+          console.error('Content-Length header not found in response');
+        }
+        return response.text();
+      })
       .then((csvText) => parseCSV(csvText))
       .catch((error) => {
         console.error("Error fetching CSV file:", error);
@@ -152,9 +188,6 @@ export default function DatasetPage() {
     return <div>No data found...</div>;
   }
 
-  function handleUpvote() {
-    console.log("Upvoted");
-  }
 
   function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -170,11 +203,64 @@ export default function DatasetPage() {
 
   // const [completeness, setCompleteness] = useState(0);
   // const [credibility, setCredibility] = useState(0);
-
-
   // if all 4 values  Subtitle Tag Description CoverImage exist --100% complete , if 3 exist 75% complete , if 2 exist 50% complete , if 1 exist 25% complete , if none exist 0% complete
-  
-  
+
+
+  function handleUpvote() {
+    setIsUpvoted(!isUpvoted);
+    const newUpvoteCount = isUpvoted ? upvoteCount - 1 : upvoteCount + 1;
+    localStorage.setItem(id, newUpvoteCount);
+    setUpvoteCount(newUpvoteCount);
+  };
+
+
+  const countColumnTypes = () => {
+    let stringCount = 0;
+    let integerCount = 0;
+    let booleanCount = 0;
+
+    if (csvData.length > 0) {
+      const firstRow = csvData[0];
+      Object.values(firstRow).forEach(value => {
+        if (typeof value === 'string') {
+          stringCount++;
+        } else if (typeof value === 'number' && Number.isInteger(value)) {
+          integerCount++;
+        } else if (typeof value === 'boolean') {
+          booleanCount++;
+        }
+      });
+    }
+
+    return { stringCount, integerCount, booleanCount };
+  };
+
+  // Function to toggle the accordion
+  const toggleAccordion = () => {
+    setIsAccordionOpen(!isAccordionOpen);
+  };
+
+
+  const { stringCount, integerCount, booleanCount } = countColumnTypes();
+
+
+  const toggleCollaboratorsAccordion = () => {
+    setCollaboratorsAccordionOpen(!collaboratorsAccordionOpen);
+  };
+
+  const toggleAuthorsAccordion = () => {
+    setAuthorsAccordionOpen(!authorsAccordionOpen);
+  };
+
+  const toggleCoverageAccordion = () => {
+    setCoverageAccordionOpen(!coverageAccordionOpen);
+  };
+
+  const toggleDoiCitationAccordion = () => {
+    setDoiCitationAccordionOpen(!doiCitationAccordionOpen);
+  };
+
+
   return (
     <>
       <div className="flex flex-col items-center my-4">
@@ -200,18 +286,21 @@ export default function DatasetPage() {
                   className="border-r hover:bg-gray-100 rounded-l-full cursor-pointer w-10 h-10 p-2 border-gray-400"
                 />
               </span>
-              <span className="pl-2 py-2 pr-4 font-bold">10</span>
+              <span className="pl-2 py-2 pr-4 font-bold">
+                {upvoteCount}
+              </span>
               <Tooltip id="my-tooltip" />
             </div>
             {/* upvote button */}
             {/* download button */}
-            <div
+            <div data-tooltip-id="my-tooltip" data-tooltip-content="download CSV file"
               onClick={handleDownload}
               className="rounded-full flex gap-2 py-2 px-4 bg-black text-white hover:shadow-lg  cursor-pointer font-semibold border border-gray-300"
             >
               <DownloadIcon />
-              Download (21 kB)
+              Download ({fileSize.toFixed(2)} KB{" "})
             </div>
+            <Tooltip id="my-tooltip" />
             {/* download button */}
           </div>
         </div>
@@ -221,7 +310,7 @@ export default function DatasetPage() {
       {/* title */}
       <div className="w-full flex px-16 justify-between items-center">
         <div className="w-full md:max-w-6xl mx-auto">
-          <h1 className="font-bold text-5xl text-left mb-4 ">
+          <h1 className="font-bold text-5xl text-left mb-4 mr-4">
             {capitalizeFirstLetter(dataset.title)}
           </h1>
           <h5 className="text-base text-gray-500 text-left">
@@ -296,8 +385,7 @@ export default function DatasetPage() {
               {tags.map((tag, id) => (
                 <span
                   key={id}
-                  className="border-gray-400 cursor-pointer hover:border-gray-700 rounded-full border px-2.5 py-1.5 mr-2 mb-2"
-                >
+                  className="border-gray-400 cursor-pointer hover:border-gray-700 rounded-full border px-2.5 py-1.5 mr-2 mb-2">
                   {tag}
                 </span>
               ))}
@@ -314,7 +402,58 @@ export default function DatasetPage() {
       </div>
       {/* datacard */}
 
+      {/* dataset table */}
+      <div className="border-y border-gray-300 items-start  justify-start flex gap-4 w-full my-6 px-16 py-6">
+        <div className="flex-[4] border rounded-lg border-gray-300 ">
+          {/* two cols one for title and one for table */}
+          <div className="flex  flex-col justify-between items-start">
 
+            <div className="flex justify-between border-b border-gray-400 w-full p-3 pr-6 gap-2 items-center">
+              <div className="font-bold text-2xl p-2 text-left">{dataset.title} <span className="text-gray-400 font-normal text-xl">({fileSize.toFixed(2)} KB{" "})</span>  </div>
+
+              <div data-tooltip-id="download-icon" className="cursor-pointer" data-tooltip-content="download CSV file"><DownloadIcon /></div>
+            </div>
+            <Tooltip id="download-icon" />
+
+            <div className="content w-full" >
+              {csvData.length > 0 && <CSVDataTable data={csvData} />}
+            </div >
+
+          </div>
+        </div>
+
+        {/* summary */}
+        <div className="flex-[1] p-2 items-start justify-start h-full w-full ">
+          <div className="font-bold text-xl mb-2">
+            Summary
+          </div>
+          <div>
+            <span className="text-gray-500 underline">  Version 1</span>
+            <span className="text-gray-700"> ({fileSize.toFixed(2)} KB{" "}) </span>
+          </div>
+          <div className="text-gray-500 mt-2">Last updated {dataset.updatedAt}</div>
+          <div className="flex flex-col text-gray-800 my-6 gap-2">
+
+            <div className="flex w-full gap-2 place-items-center mb-4" >
+              <Folder /> <span> 1 Files</span>
+            </div>
+
+            <div className="flex w-full cursor-pointer justify-between gap-4 place-items-center" onClick={toggleAccordion}>
+              <div className="flex gap-2"><span><Columns3Icon /></span> {csvData[0] ? Object.keys(csvData[0]).length : 0} Columns</div>
+              {isAccordionOpen ? (<ChevronUp />) : (<ChevronDown />)}
+            </div>
+            {isAccordionOpen && (
+              <div className="ml-2 flex flex-col gap-2 mt-2">
+                <div className="flex gap-4 justify-between  w-full items-center"><span className="flex place-items-center gap-2"><ALargeSmallIcon className="w-6 h-6" /> String </span> <span>{stringCount}</span> </div>
+                <div className="flex gap-4 justify-between w-full items-center"><span className="flex place-items-center gap-2"><HashIcon className="w-6 h-6" /> Integer </span> <span>{integerCount}</span></div>
+                <div className="flex gap-4 justify-between w-full items-center"><span className="flex place-items-center gap-2"><BinaryIcon className="w-6 h-6" /> Boolean </span> <span>{booleanCount}</span></div>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* summary */}
+      </div >
+      {/* dataset table */}
 
 
       {/* metadata */}
@@ -325,31 +464,31 @@ export default function DatasetPage() {
         </div>
 
         {/* collaborators */}
-        <div className="flex flex-col gap-4 pr-12 mt-6 py-4 border-y border-gray-400 place-items-center">
-
-          <div className="flex justify-between items-center w-full gap-2">
-            <h4 className="font-bold text-2xl text-left">Collaborators</h4>
-            <ChevronDown />
-          </div>
-          <div className="flex  flex-col gap-4 place-items-start w-full">
-            <div className="flex gap-2 place-items-center">
-              <img
-                className="w-10 h-10 object-cover rounded-full"
-                src="/logo512.png"
-                alt=""
-              />
-              {capitalizeFirstLetter(dataset.author.username)} (Owner)
-            </div>
-            <div className="flex gap-2 place-items-center">
-              <img
-                className="w-10 h-10 object-cover rounded-full"
-                src="/logo512.png"
-                alt=""
-              />
-              {capitalizeFirstLetter(dataset.author.username)}
-            </div>
-          </div>
+        <div onClick={toggleCollaboratorsAccordion} className={`flex cursor-pointer justify-between items-center w-full mt-4 py-4 pr-6 border-t ${!collaboratorsAccordionOpen&&"border-b border-gray-300"} border-gray-300`}>
+          <h4 className="font-bold text-2xl text-left">Collaborators</h4>
+          {collaboratorsAccordionOpen ? <ChevronDown /> : <ChevronUp />}
         </div>
+        {collaboratorsAccordionOpen && (
+          <div className="flex gap-8 border-b pb-4 px-2 border-gray-300 place-items-start w-full">
+            <div className="flex gap-2 place-items-center">
+              <img
+                className="w-10 h-10 object-cover rounded-full"
+                src="/logo512.png"
+                alt=""
+              />
+              Collaborator 1
+            </div>
+            <div className="flex gap-2 place-items-center">
+              <img
+                className="w-10 h-10 object-cover rounded-full"
+                src="/logo512.png"
+                alt=""
+              />
+              Collaborator 2
+            </div>
+          </div>
+        )}
+
         {/* collaborators */}
 
         {/* DOI citaitons */}
@@ -377,13 +516,14 @@ export default function DatasetPage() {
         {/* License */}
         {/* metadata end */}
 
+
         {/* similar datasets */}
         <div className="flex flex-col my-6 gap-4 ">
           <div className="flex gap-4 place-items-center">
             <Table2Icon />
             <div className="font-bold text-2xl text-left">Similar Datasets</div>
           </div>
-          <div className="flex gap-4 place-items-center">
+          <div className="grid grid-cols-4 gap-4">
             {RelatedDataset.length > 0 && RelatedDataset.slice(0, 5).map((dataset, id) => (
               <DatasetCard key={id} {...dataset} />
             ))}
@@ -396,27 +536,5 @@ export default function DatasetPage() {
   );
 }
 
-{
-  /* <img className="w-full md:max-w-lg h-auto mx-auto  mb-4" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
-        <div className="text-gray-600 text-sm text-center">
-          <div className="flex flex-col items-center mb-2">
-            <span className="mr-2">Author @{dataset.author.username}</span>
-            <time>{format(new Date(dataset.createdAt), "do MMM yyyy")}</time>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-center mb-4">
-          {tags.map((tag, id) => (
-            <span key={id} className="bg-gray-200 px-2 py-1 text-xs rounded mr-2 mb-2">{tag}</span>
-          ))}
-        </div>
-        <button
-          onClick={handleDownload}
-          className="bg-blue-500 text-white py-2 px-4 rounded w-full md:w-auto focus:outline-none hover:bg-blue-700"
-        >
-          Download Dataset
-        </button>
-      </div>
-      <div className="w-full md:max-w-6xl mx-auto">
-        <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
-        {csvData.length > 0 && <CSVDataTable data={csvData} />} */
-}
+
+
