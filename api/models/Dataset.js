@@ -12,6 +12,7 @@ const DatasetSchema = new Schema({
   tags: String,
   subtitle:String,
   license: String,
+  upvotes: { type: Number, default: 0 },
   author: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,

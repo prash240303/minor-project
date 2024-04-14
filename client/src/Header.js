@@ -27,22 +27,22 @@ export default function Header() {
   const username = userInfo?.username;
 
   return (
-    <header>
+    <header className="flex justify-between border border-b sticky w-full top-0">
       <Link to="/" className="logo">MyDataSet</Link>
       <nav>
         {username && (
           <>
-            <Link className="rounded-full flex gap-4 items-center justify-center font-bold text-lg shadow-lg border border-gray-200 px-3 pr-4 py-3" to="/createdata"> 
-              <PlusCircleIcon className="w-8 text-blue-500 h-8"/>
+            <Link className="rounded-full flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3" to="/createdata">
+              <PlusCircleIcon className="w-8 text-blue-500 h-8" />
               Upload new dataset</Link>
             <div onClick={logout}>Logout ({username})</div>
           </>
         )}
         {!username && (
           <>
-          <div className="search-bar">
-          <input type="text" className="search-input" placeholder="Search" />
-        </div>
+            <div className="search-bar">
+              <input type="text" className="search-input" placeholder="Search" />
+            </div>
             <Link to="/login">Login</Link>
             <Link to="/register">Register</Link>
           </>

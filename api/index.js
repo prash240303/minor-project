@@ -21,8 +21,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-
-
 // // Initialize Firebase Admin SDK
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
@@ -88,7 +86,7 @@ app.post('/logout', (req, res) => {
 // dataset 
 app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 }, { name: 'dataset', maxCount: 1 }]), async (req, res) => {
   const { coverimage, dataset } = req.files;
-  
+
   // Handle image file
   const imageFile = coverimage[0];
   const imagePath = imageFile.path;
@@ -110,7 +108,7 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
     if (err) throw err;
     console.log('request body', req.body)
 
-    const { title, summary,tag,doi, content,license, subtitle } = req.body;
+    const { title, summary, tag, doi, content, license, upvotes, subtitle } = req.body;
     const datasetDoc = await Dataset.create({
       title,
       summary,
@@ -119,77 +117,60 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
       content,
       subtitle,
       license,
-      coverimage: newImagePath, 
-      dataset: newDatasetPath, 
+      upvotes,
+      coverimage: newImagePath,
+      dataset: newDatasetPath,
       author: info.id,
     });
-    console.log("doc:" , datasetDoc)
+    console.log("doc:", datasetDoc)
     res.json(datasetDoc);
   });
 });
 
-// app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 }, { name: 'dataset', maxCount: 1 }]), async (req, res) => {
-//   const { coverimage, dataset } = req.files;
-  
-//   // Handle image file
-//   const imageFile = coverimage[0];
-//   const imagePath = imageFile.path;
-//   const imageParts = imageFile.originalname.split('.');
-//   const imageExt = imageParts[imageParts.length - 1];
-//   const newImagePath = imagePath + '.' + imageExt;
-
-//   // Upload image to Firebase Storage
-//   await bucket.upload(newImagePath, {
-//     destination: `datasets/${imageFile.filename}.${imageExt}`,
-//   });
-
-//   // Handle dataset file
-//   const datasetFile = dataset[0];
-//   const datasetPath = datasetFile.path;
-//   const datasetParts = datasetFile.originalname.split('.');
-//   const datasetExt = datasetParts[datasetParts.length - 1];
-//   const newDatasetPath = datasetPath + '.' + datasetExt;
-
-//   // Upload dataset to Firebase Storage
-//   await bucket.upload(newDatasetPath, {
-//     destination: `datasets/${datasetFile.filename}.${datasetExt}`,
-//   });
-
-//   // Delete local files
-//   fs.unlinkSync(newImagePath);
-//   fs.unlinkSync(newDatasetPath);
-
-//   const { token } = req.cookies;
-//   jwt.verify(token, secret, {}, async (err, info) => {
-//     if (err) throw err;
-
-//     const { title, summary, tag, doi, content } = req.body;
-//     const coverImageUrl = `datasets/${imageFile.filename}.${imageExt}`;
-//     const datasetUrl = `datasets/${datasetFile.filename}.${datasetExt}`;
-
-//     const datasetDoc = await Dataset.create({
-//       title,
-//       summary,
-//       tag,
-//       doi,
-//       content,
-//       coverimage: coverImageUrl,
-//       dataset: datasetUrl,
-//       author: info.id,
-//     });
-
-//     res.json(datasetDoc);
-//   });
-// });
-
-app.get('/dataset', async (req,res) => {
+app.get('/dataset', async (req, res) => {
   res.json(
     await Dataset.find()
       .populate('author', ['username'])
-      .sort({createdAt: -1})
+      .sort({ createdAt: -1 })
       .limit(20)
   );
 });
+
+
+app.post('/upvote/:id', async (req, res) => {
+  const { id } = req.params;
+  const datasetDoc = await Dataset.findById(id);
+  datasetDoc.upvotes += 1;
+  await datasetDoc.save();
+  res.json(datasetDoc);
+}
+);
+
+
+app.post('/upvote/:id', async (req, res) => {
+  const { id } = req.params;
+  let upvoteType;
+
+  // Check the headers to determine the vote type (upvote or downvote)
+  if (req.headers['vote-type'] === 'upvote') {
+    upvoteType = 1; // Upvote
+  } else if (req.headers['vote-type'] === 'downvote') {
+    upvoteType = -1; // Downvote
+  } else {
+    return res.status(400).json({ error: 'Invalid vote type' });
+  }
+
+  try {
+    const datasetDoc = await Dataset.findById(id);
+    datasetDoc.upvotes += upvoteType;
+    await datasetDoc.save();
+    res.json(datasetDoc);
+  } catch (error) {
+    console.error("Error upvoting dataset:", error);
+    res.status(500).json({ error: 'Failed to upvote dataset' });
+  }
+});
+
 
 
 app.get('/dataset/:id', async (req, res) => {

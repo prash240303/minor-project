@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../UserContext";
@@ -16,11 +17,14 @@ import DatasetCard from "../DatasetCard";
 export default function DatasetPage() {
   const [dataset, setDataset] = useState(null);
   const [RelatedDataset, setRelatedDataset] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const { userInfo } = useContext(UserContext);
   const [csvData, setCsvData] = useState([]);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [upvoteCount, setUpvoteCount] = useState(0); // State to track upvote count
+  const [isUpvoted, setIsUpvoted] = useState(false);
 
-  
+
   const { id } = useParams();
   const timeDifference = (current, previous) => {
     const milliSecondsPerMinute = 60 * 1000;
@@ -60,6 +64,14 @@ export default function DatasetPage() {
     }
   };
   useEffect(() => {
+    // Retrieve upvote count from localStorage when component mounts
+    const storedUpvotes = localStorage.getItem(id);
+    if (storedUpvotes) {
+      setUpvoteCount(parseInt(storedUpvotes));
+    }
+  }, [id]);
+
+  useEffect(() => {
     fetch(`http://localhost:4000/dataset/${id}`)
       .then((response) => response.json())
       .then((datasetInfo) => {
@@ -87,6 +99,7 @@ export default function DatasetPage() {
       }).catch((error) => {
         console.error("Error fetching related dataset:", error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
 
@@ -152,9 +165,6 @@ export default function DatasetPage() {
     return <div>No data found...</div>;
   }
 
-  function handleUpvote() {
-    console.log("Upvoted");
-  }
 
   function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -173,8 +183,17 @@ export default function DatasetPage() {
 
 
   // if all 4 values  Subtitle Tag Description CoverImage exist --100% complete , if 3 exist 75% complete , if 2 exist 50% complete , if 1 exist 25% complete , if none exist 0% complete
-  
-  
+
+
+
+  function handleUpvote() {
+    setIsUpvoted(!isUpvoted);
+    // Update upvote count in localStorage
+    const newUpvoteCount = isUpvoted ? upvoteCount - 1 : upvoteCount + 1;
+    localStorage.setItem(id, newUpvoteCount);
+    setUpvoteCount(newUpvoteCount);
+  };
+
   return (
     <>
       <div className="flex flex-col items-center my-4">
@@ -200,7 +219,9 @@ export default function DatasetPage() {
                   className="border-r hover:bg-gray-100 rounded-l-full cursor-pointer w-10 h-10 p-2 border-gray-400"
                 />
               </span>
-              <span className="pl-2 py-2 pr-4 font-bold">10</span>
+              <span className="pl-2 py-2 pr-4 font-bold">
+                {upvoteCount}
+              </span>
               <Tooltip id="my-tooltip" />
             </div>
             {/* upvote button */}
@@ -314,7 +335,21 @@ export default function DatasetPage() {
       </div>
       {/* datacard */}
 
+      {/* dataset table */}
+      <div className="border-y border-gray-300 items-center justify-center flex gap-4 w-full my-6 px-16 py-6">
+        {/* table */}
+        <div className="flex-[4] border rounded-lg border-gray-300 p-3">
+          table
+        </div>
+        {/* table */}
 
+        {/* summary */}
+        <div className="flex-[1] p-2 font-bold text-xl">
+          Summary
+        </div>
+        {/* summary */}
+      </div>
+      {/* dataset table */}
 
 
       {/* metadata */}
@@ -377,6 +412,7 @@ export default function DatasetPage() {
         {/* License */}
         {/* metadata end */}
 
+
         {/* similar datasets */}
         <div className="flex flex-col my-6 gap-4 ">
           <div className="flex gap-4 place-items-center">
@@ -396,27 +432,10 @@ export default function DatasetPage() {
   );
 }
 
-{
-  /* <img className="w-full md:max-w-lg h-auto mx-auto  mb-4" src={`http://localhost:4000/${dataset.coverimage}`} alt="" />
-        <div className="text-gray-600 text-sm text-center">
-          <div className="flex flex-col items-center mb-2">
-            <span className="mr-2">Author @{dataset.author.username}</span>
-            <time>{format(new Date(dataset.createdAt), "do MMM yyyy")}</time>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-center mb-4">
-          {tags.map((tag, id) => (
-            <span key={id} className="bg-gray-200 px-2 py-1 text-xs rounded mr-2 mb-2">{tag}</span>
-          ))}
-        </div>
-        <button
-          onClick={handleDownload}
-          className="bg-blue-500 text-white py-2 px-4 rounded w-full md:w-auto focus:outline-none hover:bg-blue-700"
-        >
-          Download Dataset
-        </button>
-      </div>
-      <div className="w-full md:max-w-6xl mx-auto">
-        <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
-        {csvData.length > 0 && <CSVDataTable data={csvData} />} */
-}
+// eslint-disable-next-line no-lone-blocks
+{/* 
+  <div className="w-full md:max-w-6xl mx-auto">
+    <div className="content" dangerouslySetInnerHTML={{ __html: dataset.content }} />
+    {csvData.length > 0 && <CSVDataTable data={csvData} />}
+
+*/}
