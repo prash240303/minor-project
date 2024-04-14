@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./UserContext";
 import "./styles/Header.css";
-import { PlusCircleIcon } from "lucide-react";
+import { InspectionPanel, PlusCircleIcon } from "lucide-react";
 
 export default function Header() {
   const { setUserInfo, userInfo } = useContext(UserContext);
@@ -27,27 +27,24 @@ export default function Header() {
   const username = userInfo?.username;
 
   return (
-    <header className="flex justify-between border border-b sticky w-full top-0">
-      <Link to="/" className="logo">MyDataSet</Link>
-      <nav>
+    <header className="flex justify-between items-center border border-b z-10 py-4 px-20 bg-white sticky w-full top-0">
+      <Link to="/" className="logo flex items-center justify-center font-bold text-3xl gap-4"> <InspectionPanel /> MyDataSet</Link>
+      <div className="flex justify-center items-center gap-4">
         {username && (
           <>
             <Link className="rounded-full flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3" to="/createdata">
               <PlusCircleIcon className="w-8 text-blue-500 h-8" />
               Upload new dataset</Link>
-            <div onClick={logout}>Logout ({username})</div>
+            <div onClick={logout} className="rounded-full flex gap-4 items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Logout ({username})</div>
           </>
         )}
         {!username && (
           <>
-            <div className="search-bar">
-              <input type="text" className="search-input" placeholder="Search" />
-            </div>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <Link to="/login" className="rounded-full cursor-pointer flex gap-4 hover:shadow-sm hover:bg-black hover:text-white items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Login</Link>
+            <Link to="/register" className="rounded-full flex gap-4 cursor-pointer hover:shadow-md items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Register</Link>
           </>
         )}
-      </nav>
+      </div>
     </header>
   );
 }

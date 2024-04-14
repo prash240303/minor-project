@@ -2,7 +2,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../UserContext";
-// import CSVDataTable from "../CSVDataTable";
+import CSVDataTable from "../CSVDataTable";
 import {
   ChevronDown,
   ChevronUp,
@@ -23,7 +23,7 @@ export default function DatasetPage() {
   const [showFullContent, setShowFullContent] = useState(false);
   const [upvoteCount, setUpvoteCount] = useState(0); // State to track upvote count
   const [isUpvoted, setIsUpvoted] = useState(false);
-
+  const [fileSize, setFileSize] = useState(0);
 
   const { id } = useParams();
   const timeDifference = (current, previous) => {
@@ -94,18 +94,31 @@ export default function DatasetPage() {
           ...dataset,
           updatedAt: timeDifference(new Date(), new Date(dataset.createdAt))
         }));
-        console.log("related datasets", updatedDatasets)
         setRelatedDataset(updatedDatasets)
       }).catch((error) => {
         console.error("Error fetching related dataset:", error);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, []);
 
 
+  // fetchCSVFile function
   const fetchCSVFile = (filePath) => {
     fetch(`http://localhost:4000/${filePath.replace(/\\/g, "/")}`)
-      .then((response) => response.text())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const contentLength = response.headers.get('Content-Length');
+        if (contentLength) {
+          const fileSizeInBytes = parseInt(contentLength, 10);
+          const fileSizeInKB = fileSizeInBytes / 1024; // 
+          setFileSize(fileSizeInKB);
+        } else {
+          console.error('Content-Length header not found in response');
+        }
+        return response.text();
+      })
       .then((csvText) => parseCSV(csvText))
       .catch((error) => {
         console.error("Error fetching CSV file:", error);
@@ -180,10 +193,7 @@ export default function DatasetPage() {
 
   // const [completeness, setCompleteness] = useState(0);
   // const [credibility, setCredibility] = useState(0);
-
-
   // if all 4 values  Subtitle Tag Description CoverImage exist --100% complete , if 3 exist 75% complete , if 2 exist 50% complete , if 1 exist 25% complete , if none exist 0% complete
-
 
 
   function handleUpvote() {
@@ -226,13 +236,14 @@ export default function DatasetPage() {
             </div>
             {/* upvote button */}
             {/* download button */}
-            <div
+            <div data-tooltip-id="my-tooltip" data-tooltip-content="download CSV file"
               onClick={handleDownload}
               className="rounded-full flex gap-2 py-2 px-4 bg-black text-white hover:shadow-lg  cursor-pointer font-semibold border border-gray-300"
             >
               <DownloadIcon />
-              Download (21 kB)
+              Download ({fileSize.toFixed(2)} KB{" "})
             </div>
+            <Tooltip id="my-tooltip" />
             {/* download button */}
           </div>
         </div>
@@ -242,7 +253,7 @@ export default function DatasetPage() {
       {/* title */}
       <div className="w-full flex px-16 justify-between items-center">
         <div className="w-full md:max-w-6xl mx-auto">
-          <h1 className="font-bold text-5xl text-left mb-4 ">
+          <h1 className="font-bold text-5xl text-left mb-4 mr-4">
             {capitalizeFirstLetter(dataset.title)}
           </h1>
           <h5 className="text-base text-gray-500 text-left">
@@ -317,8 +328,7 @@ export default function DatasetPage() {
               {tags.map((tag, id) => (
                 <span
                   key={id}
-                  className="border-gray-400 cursor-pointer hover:border-gray-700 rounded-full border px-2.5 py-1.5 mr-2 mb-2"
-                >
+                  className="border-gray-400 cursor-pointer hover:border-gray-700 rounded-full border px-2.5 py-1.5 mr-2 mb-2">
                   {tag}
                 </span>
               ))}
@@ -337,18 +347,27 @@ export default function DatasetPage() {
 
       {/* dataset table */}
       <div className="border-y border-gray-300 items-center justify-center flex gap-4 w-full my-6 px-16 py-6">
-        {/* table */}
-        <div className="flex-[4] border rounded-lg border-gray-300 p-3">
-          table
+        <div className="flex-[4] border rounded-lg border-gray-300 ">
+          {/* two cols one for title and one for table */}
+          <div className="flex  flex-col justify-between items-start">
+
+            <div className="flex border-b border-gray-400 w-full p-3 gap-2 place-items-center">
+              <h3 className="font-bold text-2xl p-2 text-left">{dataset.title} <span className="text-gray-400 font-normal text-xl">({fileSize.toFixed(2)} KB{" "})</span>  </h3>
+            </div>
+
+            <div className="content" >
+              {csvData.length > 0 && <CSVDataTable data={csvData} />}
+            </div >
+
+          </div>
         </div>
-        {/* table */}
 
         {/* summary */}
         <div className="flex-[1] p-2 font-bold text-xl">
           Summary
         </div>
         {/* summary */}
-      </div>
+      </div >
       {/* dataset table */}
 
 
@@ -419,7 +438,7 @@ export default function DatasetPage() {
             <Table2Icon />
             <div className="font-bold text-2xl text-left">Similar Datasets</div>
           </div>
-          <div className="flex gap-4 place-items-center">
+          <div className="grid grid-cols-4 gap-4">
             {RelatedDataset.length > 0 && RelatedDataset.slice(0, 5).map((dataset, id) => (
               <DatasetCard key={id} {...dataset} />
             ))}
@@ -439,3 +458,12 @@ export default function DatasetPage() {
     {csvData.length > 0 && <CSVDataTable data={csvData} />}
 
 */}
+
+
+{/*  <div className="grid grid-cols-4 gap-4 p-6 mx-24 ">
+        {dataset.length > 0 && dataset.map((dataset, id) => (
+          <DatasetCard key={id} {...dataset} />
+        ))}
+      </div> */}
+
+

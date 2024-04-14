@@ -108,7 +108,7 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
     if (err) throw err;
     console.log('request body', req.body)
 
-    const { title, summary, tag, doi, content, license, upvotes, subtitle } = req.body;
+    const { title, summary, tag, doi, content, license, subtitle } = req.body;
     const datasetDoc = await Dataset.create({
       title,
       summary,
@@ -117,7 +117,6 @@ app.post('/dataset', uploadMiddleware.fields([{ name: 'coverimage', maxCount: 1 
       content,
       subtitle,
       license,
-      upvotes,
       coverimage: newImagePath,
       dataset: newDatasetPath,
       author: info.id,
