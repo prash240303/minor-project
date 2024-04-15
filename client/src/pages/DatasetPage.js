@@ -34,6 +34,11 @@ export default function DatasetPage() {
   const [authorsAccordionOpen, setAuthorsAccordionOpen] = useState(false);
   const [coverageAccordionOpen, setCoverageAccordionOpen] = useState(false);
   const [doiCitationAccordionOpen, setDoiCitationAccordionOpen] = useState(false);
+  const [doiAccordionOpen, setDoiAccordionOpen] = useState(false);
+  const [licenseAccordionOpen, setLicenseAccordionOpen] = useState(false);
+  const toggleDoiAccordion = () => { setDoiAccordionOpen(!doiAccordionOpen); };
+const toggleLicenseAccordion = () => {setLicenseAccordionOpen(!licenseAccordionOpen);};
+  
 
   const { id } = useParams();
   const timeDifference = (current, previous) => {
@@ -464,9 +469,9 @@ export default function DatasetPage() {
         </div>
 
         {/* collaborators */}
-        <div onClick={toggleCollaboratorsAccordion} className={`flex cursor-pointer justify-between items-center w-full mt-4 py-4 pr-6 border-t ${!collaboratorsAccordionOpen&&"border-b border-gray-300"} border-gray-300`}>
+        <div onClick={toggleCollaboratorsAccordion} className={`flex cursor-pointer justify-between items-center w-full mt-4 py-4 pr-6 border-t ${!collaboratorsAccordionOpen && "border-b border-gray-300"} border-gray-300`}>
           <h4 className="font-bold text-2xl text-left">Collaborators</h4>
-          {collaboratorsAccordionOpen ? <ChevronDown /> : <ChevronUp />}
+          {collaboratorsAccordionOpen ? <ChevronUp /> : <ChevronDown />}
         </div>
         {collaboratorsAccordionOpen && (
           <div className="flex gap-8 border-b pb-4 px-2 border-gray-300 place-items-start w-full">
@@ -492,27 +497,36 @@ export default function DatasetPage() {
         {/* collaborators */}
 
         {/* DOI citaitons */}
-        <div className="flex flex-col gap-4 pr-12  py-4 border-b border-gray-400 place-items-center">
-          <div className="flex justify-between items-center w-full gap-2">
-            <h4 className="font-bold text-2xl text-left">DOI Citaitons</h4>
-            <ChevronDown />
-          </div>
-          <div className="flex flex-col gap-4 place-items-start w-full">
-            {dataset.doi}
-          </div>
+        <div onClick={toggleDoiAccordion} className={`flex cursor-pointer justify-between items-center w-full  py-4 pr-6 ${!doiAccordionOpen && "border-b border-gray-300"} border-gray-300`}>
+          <h4 className="font-bold text-2xl text-left">DOI Citations</h4>
+          {doiAccordionOpen ? <ChevronUp /> : <ChevronDown />}
         </div>
+        {doiAccordionOpen && (
+          <div className="flex flex-col gap-4 pr-12 py-4 border-b border-gray-400 place-items-center">
+            {/* <div className="flex justify-between items-center w-full gap-2">
+              <ChevronDown />
+            </div> */}
+            <div className="flex flex-col gap-4 place-items-start w-full">
+              {dataset.doi}
+            </div>
+          </div>
+        )}
         {/* DOI citaitons */}
 
         {/* License */}
-        <div className="flex flex-col gap-4 pr-12  py-4 border-b border-gray-400 place-items-center">
-          <div className="flex justify-between items-center w-full gap-2">
-            <h4 className="font-bold text-2xl text-left">License</h4>
-            <ChevronDown />
-          </div>
-          <div className="flex flex-col gap-4 place-items-start w-full">
-            {dataset.license}
-          </div>
+        <div>
+    <div onClick={toggleLicenseAccordion} className={`flex cursor-pointer justify-between items-center w-full  py-4 pr-6  ${!licenseAccordionOpen && "border-b border-gray-300"} border-gray-300`}>
+      <h4 className="font-bold text-2xl text-left">License</h4>
+      {licenseAccordionOpen ? <ChevronUp /> : <ChevronDown />}
+    </div>
+    {licenseAccordionOpen && (
+      <div className="flex flex-col gap-4 pr-12 py-4 border-b border-gray-400 place-items-center">
+        <div className="flex flex-col gap-4 place-items-start w-full">
+          {dataset.license}
         </div>
+      </div>
+    )}
+  </div>
         {/* License */}
         {/* metadata end */}
 
