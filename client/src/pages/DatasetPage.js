@@ -37,8 +37,8 @@ export default function DatasetPage() {
   const [doiAccordionOpen, setDoiAccordionOpen] = useState(false);
   const [licenseAccordionOpen, setLicenseAccordionOpen] = useState(false);
   const toggleDoiAccordion = () => { setDoiAccordionOpen(!doiAccordionOpen); };
-const toggleLicenseAccordion = () => {setLicenseAccordionOpen(!licenseAccordionOpen);};
-  
+  const toggleLicenseAccordion = () => { setLicenseAccordionOpen(!licenseAccordionOpen); };
+
 
   const { id } = useParams();
   const timeDifference = (current, previous) => {
@@ -515,18 +515,18 @@ const toggleLicenseAccordion = () => {setLicenseAccordionOpen(!licenseAccordionO
 
         {/* License */}
         <div>
-    <div onClick={toggleLicenseAccordion} className={`flex cursor-pointer justify-between items-center w-full  py-4 pr-6  ${!licenseAccordionOpen && "border-b border-gray-300"} border-gray-300`}>
-      <h4 className="font-bold text-2xl text-left">License</h4>
-      {licenseAccordionOpen ? <ChevronUp /> : <ChevronDown />}
-    </div>
-    {licenseAccordionOpen && (
-      <div className="flex flex-col gap-4 pr-12 py-4 border-b border-gray-400 place-items-center">
-        <div className="flex flex-col gap-4 place-items-start w-full">
-          {dataset.license}
+          <div onClick={toggleLicenseAccordion} className={`flex cursor-pointer justify-between items-center w-full  py-4 pr-6  ${!licenseAccordionOpen && "border-b border-gray-300"} border-gray-300`}>
+            <h4 className="font-bold text-2xl text-left">License</h4>
+            {licenseAccordionOpen ? <ChevronUp /> : <ChevronDown />}
+          </div>
+          {licenseAccordionOpen && (
+            <div className="flex flex-col gap-4 pr-12 py-4 border-b border-gray-400 place-items-center">
+              <div className="flex flex-col gap-4 place-items-start w-full">
+                {dataset.license}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    )}
-  </div>
         {/* License */}
         {/* metadata end */}
 
