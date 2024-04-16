@@ -41,8 +41,8 @@ export default function Header() {
         )}
         {!username && (
           <>
-            <Link to="/login" className="rounded-full cursor-pointer flex gap-4 hover:shadow-sm hover:bg-black hover:text-white items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Login</Link>
-            <Link to="/register" className="rounded-full flex gap-4 cursor-pointer hover:shadow-md items-center justify-center font-semibold hover: border border-gray-200 px-3 pr-4 py-3">Register</Link>
+            <Link to="/login" className="rounded-full cursor-pointer flex gap-4 hover:shadow-sm hover:bg-black hover:text-white items-center justify-center font-semibold hover: border border-gray-200 px-6 py-3">Login</Link>
+            <Link to="/register" className="rounded-full flex gap-4 cursor-pointer hover:shadow-sm hover:bg-black hover:text-white  items-center justify-center font-semibold hover: border border-gray-200 px-6 py-3">Register</Link>
           </>
         )}
       </div>

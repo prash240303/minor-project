@@ -149,6 +149,8 @@ export default function DatasetPage() {
         parsedData.push(row);
       }
     }
+    //slice the parsedData to top 50 entries only and discard the rest for performace improvements
+    
     setCsvData(parsedData);
   };
 
@@ -220,8 +222,20 @@ export default function DatasetPage() {
     let booleanCount = 0;
 
     if (csvData.length > 0) {
-      const firstRow = csvData[0];
-      Object.values(firstRow).forEach(value => {
+      // const firstRow = csvData[1];
+      // Object.values(firstRow).forEach(value => {
+      //   if (typeof value === 'string') {
+      //     stringCount++;
+      //   } else if (typeof value === 'number' && Number.isInteger(value)) {
+      //     integerCount++;
+      //   } else if (typeof value === 'boolean') {
+      //     booleanCount++;
+      //   }
+      // });
+
+      //check the typpes of values of the data in each col 
+      const secondRow = csvData[2];
+      Object.values(secondRow).forEach(value => {
         if (typeof value === 'string') {
           stringCount++;
         } else if (typeof value === 'number' && Number.isInteger(value)) {
@@ -229,7 +243,7 @@ export default function DatasetPage() {
         } else if (typeof value === 'boolean') {
           booleanCount++;
         }
-      });
+      })
     }
 
     return { stringCount, integerCount, booleanCount };
@@ -415,10 +429,9 @@ export default function DatasetPage() {
             </div>
             <Tooltip id="download-icon" />
 
-            <div className="content w-full" >
+            <div className="content w-[1100px] overflow-x-scroll" >
               {csvData.length > 0 && <CSVDataTable data={csvData} />}
             </div >
-
           </div>
         </div>
 
@@ -464,7 +477,7 @@ export default function DatasetPage() {
         </div>
 
         {/* collaborators */}
-        <div onClick={toggleCollaboratorsAccordion} className={`flex cursor-pointer justify-between items-center w-full mt-4 py-4 pr-6 border-t ${!collaboratorsAccordionOpen&&"border-b border-gray-300"} border-gray-300`}>
+        <div onClick={toggleCollaboratorsAccordion} className={`flex cursor-pointer justify-between items-center w-full mt-4 py-4 pr-6 border-t ${!collaboratorsAccordionOpen && "border-b border-gray-300"} border-gray-300`}>
           <h4 className="font-bold text-2xl text-left">Collaborators</h4>
           {collaboratorsAccordionOpen ? <ChevronDown /> : <ChevronUp />}
         </div>
